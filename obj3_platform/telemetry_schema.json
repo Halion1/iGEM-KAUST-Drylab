@@ -1,0 +1,103 @@
+{
+  "type": "object",
+  "required": [
+    "device_id",
+    "timestamp",
+    "heartbeat",
+    "sensors",
+    "actuator_status"
+  ],
+  "properties": {
+    "device_id": {
+      "type": "string",
+      "description": "Unique identifier of the Arduino device"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 timestamp when telemetry was generated"
+    },
+    "heartbeat": {
+      "type": "integer",
+      "description": "Heartbeat signal (1 = alive)"
+    },
+    "sensors": {
+      "type": "object",
+      "required": [
+        "temperature_c",
+        "ph",
+        "pressure_kpa",
+        "co2_ppm"
+      ],
+      "properties": {
+        "temperature_c": {
+          "type": "object",
+          "required": ["sensor_1", "sensor_2"],
+          "properties": {
+            "sensor_1": { "type": "number" },
+            "sensor_2": { "type": "number" }
+          }
+        },
+        "ph": {
+          "type": "object",
+          "required": ["sensor_1", "sensor_2"],
+          "properties": {
+            "sensor_1": { "type": "number" },
+            "sensor_2": { "type": "number" }
+          }
+        },
+        "pressure_kpa": {
+          "type": "number"
+        },
+        "co2_ppm": {
+          "type": "number"
+        }
+      }
+    },
+    "actuator_status": {
+      "type": "object",
+      "required": [
+        "pump_1",
+        "pump_2",
+        "motor_1",
+        "motor_2",
+        "heater_1"
+      ],
+      "properties": {
+        "pump_1": {
+          "type": "string",
+          "enum": ["on", "off"]
+        },
+        "pump_2": {
+          "type": "string",
+          "enum": ["on", "off"]
+        },
+        "motor_1": {
+          "type": "string",
+          "enum": ["on", "off", "forward", "reverse"]
+        },
+        "motor_2": {
+          "type": "string",
+          "enum": ["on", "off", "forward", "reverse"]
+        },
+        "heater_1": {
+          "type": "string",
+          "enum": ["on", "off"]
+        }
+      }
+    },
+    "fault_flags": {
+      "type": "object",
+      "properties": {
+        "sensor_timeout": { "type": "boolean" },
+        "heater_fault": { "type": "boolean" },
+        "motor_driver_fault": { "type": "boolean" }
+      },
+      "required": [
+        "sensor_timeout",
+        "heater_fault",
+        "motor_driver_fault"
+      ]
+    }
+  }
+}

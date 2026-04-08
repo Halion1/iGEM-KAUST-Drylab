@@ -1,0 +1,63 @@
+{
+  "type": "object",
+  "required": [
+    "command_id",
+    "action",
+    "target",
+    "parameters"
+  ],
+  "properties": {
+    "command_id": {
+      "type": "string",
+      "description": "Unique identifier for the command"
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "read_sensor",
+        "start_pump",
+        "stop_pump",
+        "start_motor",
+        "stop_motor",
+        "set_heater",
+        "stop_run"
+      ],
+      "description": "Type of action to execute"
+    },
+    "target": {
+      "type": "string",
+      "enum": [
+        "pump_1",
+        "pump_2",
+        "motor_1",
+        "motor_2",
+        "heater_1",
+        "system"
+      ],
+      "description": "Hardware target of the command"
+    },
+    "parameters": {
+      "type": "object",
+      "description": "Optional parameters depending on action",
+      "properties": {
+        "duration_sec": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 300,
+          "description": "Duration for timed actions"
+        },
+        "direction": {
+          "type": "string",
+          "enum": ["forward", "reverse"],
+          "description": "Motor direction"
+        },
+        "state": {
+          "type": "string",
+          "enum": ["on", "off"],
+          "description": "On/off state for heater or simple devices"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

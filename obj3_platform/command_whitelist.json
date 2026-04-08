@@ -1,0 +1,132 @@
+{
+  "commands": [
+    {
+      "action": "read_sensor",
+      "targets": [
+        "temperature_1",
+        "temperature_2",
+        "ph_1",
+        "ph_2",
+        "pressure",
+        "co2"
+      ],
+      "allowed_states": [
+        "Idle",
+        "Readiness Check",
+        "Run Active",
+        "Alarm"
+      ],
+      "parameters": {}
+    },
+    {
+      "action": "start_pump",
+      "targets": [
+        "pump_1",
+        "pump_2"
+      ],
+      "allowed_states": [
+        "Readiness Check",
+        "Run Active"
+      ],
+      "parameters": {
+        "duration_sec": {
+          "type": "integer",
+          "min": 1,
+          "max": 120
+        }
+      }
+    },
+    {
+      "action": "stop_pump",
+      "targets": [
+        "pump_1",
+        "pump_2"
+      ],
+      "allowed_states": [
+        "Readiness Check",
+        "Run Active",
+        "Alarm"
+      ],
+      "parameters": {}
+    },
+    {
+      "action": "start_motor",
+      "targets": [
+        "motor_1",
+        "motor_2"
+      ],
+      "allowed_states": [
+        "Readiness Check",
+        "Run Active"
+      ],
+      "parameters": {
+        "direction": {
+          "type": "string",
+          "allowed": [
+            "forward",
+            "reverse"
+          ]
+        },
+        "duration_sec": {
+          "type": "integer",
+          "min": 1,
+          "max": 60
+        }
+      }
+    },
+    {
+      "action": "stop_motor",
+      "targets": [
+        "motor_1",
+        "motor_2"
+      ],
+      "allowed_states": [
+        "Readiness Check",
+        "Run Active",
+        "Alarm"
+      ],
+      "parameters": {}
+    },
+    {
+      "action": "set_heater",
+      "targets": [
+        "heater_1"
+      ],
+      "allowed_states": [
+        "Readiness Check",
+        "Run Active",
+        "Alarm"
+      ],
+      "parameters": {
+        "state": {
+          "type": "string",
+          "allowed": [
+            "on",
+            "off"
+          ]
+        }
+      }
+    },
+    {
+      "action": "stop_run",
+      "targets": [
+        "system"
+      ],
+      "allowed_states": [
+        "Run Active",
+        "Alarm"
+      ],
+      "parameters": {}
+    },
+    {
+      "action": "ack_alarm",
+      "targets": [
+        "system"
+      ],
+      "allowed_states": [
+        "Alarm"
+      ],
+      "parameters": {}
+    }
+  ]
+}

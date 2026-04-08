@@ -1,0 +1,941 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "iGEM Mini Project MVP API",
+    "version": "1.0.0",
+    "description": "OpenAPI schema for the MVP backend covering chat, protocols, run management, status, telemetry, MCU command exchange, and alarm acknowledgement."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Local FastAPI backend"
+    }
+  ],
+  "paths": {
+    "/chat": {
+      "post": {
+        "summary": "Operator chat request",
+        "operationId": "chat",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Assistant response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/protocols": {
+      "get": {
+        "summary": "Get approved protocols",
+        "operationId": "getProtocols",
+        "responses": {
+          "200": {
+            "description": "Approved protocol list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProtocolListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/run/request": {
+      "post": {
+        "summary": "Create a proposed run configuration",
+        "operationId": "createRunRequest",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Proposed run created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunRequestResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/run/approve": {
+      "post": {
+        "summary": "Approve or reject a proposed run",
+        "operationId": "approveRun",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunApproveRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Run approval result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunApproveResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/run/start": {
+      "post": {
+        "summary": "Start an approved run",
+        "operationId": "startRun",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunStartRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Run started",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunStartResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/run/stop": {
+      "post": {
+        "summary": "Stop an active run",
+        "operationId": "stopRun",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunStopRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Run completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunStopResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/status": {
+      "get": {
+        "summary": "Get overall system status",
+        "operationId": "getStatus",
+        "responses": {
+          "200": {
+            "description": "System status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensor/latest": {
+      "get": {
+        "summary": "Get latest sensor snapshot",
+        "operationId": "getLatestSensors",
+        "responses": {
+          "200": {
+            "description": "Latest sensor data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensorLatestResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/telemetry": {
+      "post": {
+        "summary": "Receive telemetry from Arduino",
+        "operationId": "postTelemetry",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelemetryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Telemetry accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelemetryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/mcu/commands": {
+      "get": {
+        "summary": "MCU polls for pending commands",
+        "operationId": "getMcuCommands",
+        "parameters": [
+          {
+            "name": "device_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pending command list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommandListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcu/command_ack": {
+      "post": {
+        "summary": "MCU acknowledges command execution",
+        "operationId": "postCommandAck",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommandAckRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Acknowledgement accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptedResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/alarm/acknowledge": {
+      "post": {
+        "summary": "Acknowledge an active alarm",
+        "operationId": "acknowledgeAlarm",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlarmAcknowledgeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Alarm acknowledgement accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptedResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "responses": {
+      "ErrorResponse": {
+        "description": "Standard error response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "SystemState": {
+        "type": "string",
+        "enum": [
+          "Idle",
+          "Request Intake",
+          "Protocol Recommendation",
+          "Approval Pending",
+          "Readiness Check",
+          "Run Active",
+          "Alarm",
+          "Completed"
+        ]
+      },
+      "ChatContext": {
+        "type": "object",
+        "properties": {
+          "current_state": {
+            "$ref": "#/components/schemas/SystemState"
+          },
+          "selected_protocol_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "current_state",
+          "selected_protocol_id"
+        ]
+      },
+      "ChatRequest": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "context": {
+            "$ref": "#/components/schemas/ChatContext"
+          }
+        },
+        "required": [
+          "session_id",
+          "message",
+          "context"
+        ]
+      },
+      "SuggestedAction": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "protocol_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "protocol_id"
+        ]
+      },
+      "ChatResponse": {
+        "type": "object",
+        "properties": {
+          "answer": {
+            "type": "string"
+          },
+          "citations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "suggested_action": {
+            "$ref": "#/components/schemas/SuggestedAction"
+          }
+        },
+        "required": [
+          "answer",
+          "citations"
+        ]
+      },
+      "ProtocolSummary": {
+        "type": "object",
+        "properties": {
+          "protocol_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "target_compound": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "protocol_id",
+          "name",
+          "target_compound",
+          "version"
+        ]
+      },
+      "ProtocolListResponse": {
+        "type": "object",
+        "properties": {
+          "protocols": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProtocolSummary"
+            }
+          }
+        },
+        "required": [
+          "protocols"
+        ]
+      },
+      "RunRequest": {
+        "type": "object",
+        "properties": {
+          "operator_id": {
+            "type": "string"
+          },
+          "protocol_id": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "operator_id",
+          "protocol_id",
+          "notes"
+        ]
+      },
+      "ProposedConfig": {
+        "type": "object",
+        "properties": {
+          "temperature_target_c": {
+            "type": "number"
+          },
+          "ph_range": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "duration_min": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "temperature_target_c",
+          "ph_range",
+          "duration_min"
+        ]
+      },
+      "RunRequestResponse": {
+        "type": "object",
+        "properties": {
+          "run_id": {
+            "type": "string"
+          },
+          "state": {
+            "const": "Approval Pending"
+          },
+          "proposed_config": {
+            "$ref": "#/components/schemas/ProposedConfig"
+          }
+        },
+        "required": [
+          "run_id",
+          "state",
+          "proposed_config"
+        ]
+      },
+      "RunApproveRequest": {
+        "type": "object",
+        "properties": {
+          "run_id": {
+            "type": "string"
+          },
+          "operator_id": {
+            "type": "string"
+          },
+          "approved": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "run_id",
+          "operator_id",
+          "approved"
+        ]
+      },
+      "RunApproveResponse": {
+        "type": "object",
+        "properties": {
+          "run_id": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "state"
+        ]
+      },
+      "RunStartRequest": {
+        "type": "object",
+        "properties": {
+          "run_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id"
+        ]
+      },
+      "RunStartResponse": {
+        "type": "object",
+        "properties": {
+          "run_id": {
+            "type": "string"
+          },
+          "state": {
+            "const": "Run Active"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "run_id",
+          "state",
+          "started_at"
+        ]
+      },
+      "RunStopRequest": {
+        "type": "object",
+        "properties": {
+          "run_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "reason"
+        ]
+      },
+      "RunStopResponse": {
+        "type": "object",
+        "properties": {
+          "run_id": {
+            "type": "string"
+          },
+          "state": {
+            "const": "Completed"
+          }
+        },
+        "required": [
+          "run_id",
+          "state"
+        ]
+      },
+      "StatusResponse": {
+        "type": "object",
+        "properties": {
+          "system_state": {
+            "$ref": "#/components/schemas/SystemState"
+          },
+          "active_run_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "mcu_online": {
+            "type": "boolean"
+          },
+          "last_telemetry_ts": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "active_alarms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "system_state",
+          "active_run_id",
+          "mcu_online",
+          "last_telemetry_ts",
+          "active_alarms"
+        ]
+      },
+      "TemperaturePair": {
+        "type": "object",
+        "properties": {
+          "sensor_1": {
+            "type": "number"
+          },
+          "sensor_2": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "sensor_1",
+          "sensor_2"
+        ]
+      },
+      "PhPair": {
+        "type": "object",
+        "properties": {
+          "sensor_1": {
+            "type": "number"
+          },
+          "sensor_2": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "sensor_1",
+          "sensor_2"
+        ]
+      },
+      "SensorLatestResponse": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "temperature_c": {
+            "$ref": "#/components/schemas/TemperaturePair"
+          },
+          "ph": {
+            "$ref": "#/components/schemas/PhPair"
+          },
+          "pressure_kpa": {
+            "type": "number"
+          },
+          "co2_ppm": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "timestamp",
+          "temperature_c",
+          "ph",
+          "pressure_kpa",
+          "co2_ppm"
+        ]
+      },
+      "ActuatorStatus": {
+        "type": "object",
+        "properties": {
+          "pump_1": {
+            "type": "string"
+          },
+          "pump_2": {
+            "type": "string"
+          },
+          "motor_1": {
+            "type": "string"
+          },
+          "motor_2": {
+            "type": "string"
+          },
+          "heater_1": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "pump_1",
+          "pump_2",
+          "motor_1",
+          "motor_2",
+          "heater_1"
+        ]
+      },
+      "TelemetrySensors": {
+        "type": "object",
+        "properties": {
+          "temperature_c": {
+            "$ref": "#/components/schemas/TemperaturePair"
+          },
+          "ph": {
+            "$ref": "#/components/schemas/PhPair"
+          },
+          "pressure_kpa": {
+            "type": "number"
+          },
+          "co2_ppm": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "temperature_c",
+          "ph",
+          "pressure_kpa",
+          "co2_ppm"
+        ]
+      },
+      "TelemetryRequest": {
+        "type": "object",
+        "properties": {
+          "device_id": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "heartbeat": {
+            "type": "integer"
+          },
+          "sensors": {
+            "$ref": "#/components/schemas/TelemetrySensors"
+          },
+          "actuator_status": {
+            "$ref": "#/components/schemas/ActuatorStatus"
+          }
+        },
+        "required": [
+          "device_id",
+          "timestamp",
+          "heartbeat",
+          "sensors",
+          "actuator_status"
+        ]
+      },
+      "TelemetryResponse": {
+        "type": "object",
+        "properties": {
+          "accepted": {
+            "type": "boolean"
+          },
+          "server_time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "accepted"
+        ]
+      },
+      "Command": {
+        "type": "object",
+        "properties": {
+          "command_id": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string"
+          },
+          "parameters": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "command_id",
+          "action",
+          "target",
+          "parameters"
+        ]
+      },
+      "CommandListResponse": {
+        "type": "object",
+        "properties": {
+          "commands": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Command"
+            }
+          }
+        },
+        "required": [
+          "commands"
+        ]
+      },
+      "CommandAckRequest": {
+        "type": "object",
+        "properties": {
+          "device_id": {
+            "type": "string"
+          },
+          "command_id": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "executed",
+              "failed"
+            ]
+          },
+          "details": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "device_id",
+          "command_id",
+          "timestamp",
+          "status"
+        ]
+      },
+      "AlarmAcknowledgeRequest": {
+        "type": "object",
+        "properties": {
+          "alarm_id": {
+            "type": "string"
+          },
+          "operator_id": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "alarm_id",
+          "operator_id",
+          "notes"
+        ]
+      },
+      "AcceptedResponse": {
+        "type": "object",
+        "properties": {
+          "accepted": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "accepted"
+        ]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error",
+          "code"
+        ]
+      }
+    }
+  }
+}
